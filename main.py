@@ -8,7 +8,7 @@ import sys
 import datetime
 
 bot = commands.Bot(command_prefix="/", help_command=None)
-slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
+slash = SlashCommand(bot)
 
 status = cycle(['/help', "the game of Left Center Right"])
 guild_ids = [868567807133106206]
@@ -53,11 +53,13 @@ async def reload(ctx, extension=None):
                         bot.load_extension(f"cogs.{filename[:-3]}")
             except Exception as e:
                 await ctx.send(f"{e}")
+            await slash.sync_all_commands()
             await ctx.send("Successfully reloaded all extensions.")
         else:
             try:
                 bot.unload_extension(f"cogs.{extension}")
                 bot.load_extension(f"cogs.{extension}")
+                await slash.sync_all_commands()
                 await ctx.send(f"Successfully reloaded `cogs/{extension}.py`")
             except Exception as e:
                 await ctx.send(f"{e}")
@@ -65,7 +67,18 @@ async def reload(ctx, extension=None):
         await ctx.message.add_reaction('❌')
 
 
-@bot.command(name="help")
+@bot.command(aliases=["s"])
+async def sync(ctx, arg=None):
+    if arg == None:
+        await slash.sync_all_commands()
+        await ctx.send("Success!")
+    else:
+        await slash.sync_all_commands(delete_from_unused_guilds=True,
+                                      delete_perms_from_unused_guilds=True)
+        await ctx.send("Success!")
+
+
+@bot.command(aliases=["help"])
 async def dpy_help(ctx):
     embed = discord.Embed(title="Help",
                           description="Please use `/` commands instead!",
@@ -76,7 +89,6 @@ async def dpy_help(ctx):
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         bot.load_extension(f"cogs.{filename[:-3]}")
-
 
 keep_alive()
 bot.run(os.getenv('TOKEN'))

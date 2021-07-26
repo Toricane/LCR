@@ -5,17 +5,17 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 from discord_slash.model import ButtonStyle
 
 
-class Cog(commands.Cog):
+class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.color = 0xf04b14
 
     guild_ids = [868567807133106206]
 
-    @cog_ext.cog_slash(name="play",
-                       description="Play a game!",
+    @cog_ext.cog_slash(name="queue",
+                       description="Queue a game!",
                        guild_ids=guild_ids)
-    async def play(self, ctx: SlashContext):
+    async def queue(self, ctx: SlashContext):
         await ctx.defer()
         embed = discord.Embed(
             title="Click the button to join the queue!",
@@ -103,11 +103,20 @@ class Cog(commands.Cog):
                         player.replace("<@", "").replace("!",
                                                          "").replace(">", "")))
                 game_embed.add_field(
-                    name=f"{guy.display_name}",
+                    name=f"{guy.name}#{guy.discriminator}",
                     value=
                     "<:chip:868688636772777996> <:chip:868688636772777996> <:chip:868688636772777996>"
                 )
-            await ctx.send(embed=game_embed, components=[action_row])
+            game_embed.set_footer(text=f"This game's host is {ctx.author}: {ctx.author.mention}")
+            guy = await self.bot.fetch_user(
+                    int(
+                        players[0].replace("<@", "").replace("!",
+                                                         "").replace(">", "")))
+            roll_embed = discord.Embed(title=f"{guy.name}#{guy.discriminator}'s turn:",
+                                       description=":blue_square: :blue_square: :blue_square:",
+                                       color=self.color)
+            roll_embed.set_footer(text=f"This game's host is {ctx.author}: {ctx.author.mention}")
+            await ctx.send(embeds=[game_embed, roll_embed], components=[action_row])
         else:
             await ctx.edit_origin(
                 content=f"{ctx.author.mention}, you are not the host!")
@@ -135,4 +144,4 @@ class Cog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Cog(bot))
+    bot.add_cog(Game(bot))
