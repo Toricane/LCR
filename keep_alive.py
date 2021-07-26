@@ -8,9 +8,11 @@ app = Flask(__name__)
 def home():
     return "Work in progress"
 
+
 @app.route('/commands')
 def commands():
     return "Work in progress"
+
 
 def run():
     app.run(host='0.0.0.0', port=8080)

@@ -4,17 +4,8 @@ from discord.ext import commands, tasks
 from keep_alive import keep_alive
 from itertools import cycle
 from discord_slash import SlashCommand
-from discord.flags import Intents
-import re, ast, inspect
 import sys
 import datetime
-import asyncio
-from discord.utils import get
-import requests
-from discord.errors import Forbidden
-from discord_slash.utils import manage_commands, manage_components
-from discord_slash.model import ButtonStyle
-from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow, create_button
 
 bot = commands.Bot(command_prefix="/", help_command=None)
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
